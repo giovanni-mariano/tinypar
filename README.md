@@ -1,3 +1,6 @@
+<!-- SPDX-FileCopyrightText: 2026 Giovanni MARIANO -->
+<!-- SPDX-License-Identifier: MPL-2.0 -->
+
 # tinypar
 
 tinypar is a small C11 library for running an independent index range in

@@ -1,3 +1,5 @@
+// SPDX-FileCopyrightText: 2026 Giovanni MARIANO
+//
 // SPDX-License-Identifier: MPL-2.0
 
 #include "tinypar.h"
