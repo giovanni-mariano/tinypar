@@ -24,7 +24,7 @@ jobs:
           make install DESTDIR="$PWD/stage"
           mkdir dist
           tar -czf "$PWD/dist/tinypar-linux-x86_64.tar.gz" -C stage/usr/local include lib
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         with:
           name: tinypar-linux-x86_64
           path: dist/tinypar-linux-x86_64.tar.gz
@@ -42,7 +42,7 @@ jobs:
           make install DESTDIR="$PWD/stage"
           mkdir dist
           tar -czf "$PWD/dist/tinypar-macos-arm64.tar.gz" -C stage/usr/local include lib
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         with:
           name: tinypar-macos-arm64
           path: dist/tinypar-macos-arm64.tar.gz
@@ -66,7 +66,7 @@ jobs:
           Copy-Item lib/tinypar.lib dist/tinypar-windows-x64/lib/
           Copy-Item README.md,LICENSE dist/tinypar-windows-x64/
           Compress-Archive -Path dist/tinypar-windows-x64 -DestinationPath dist/tinypar-windows-x64.zip
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         with:
           name: tinypar-windows-x64
           path: dist/tinypar-windows-x64.zip
