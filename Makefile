@@ -15,6 +15,10 @@ BUILD_DIR := build
 LIB_DIR := lib
 LIBRARY := $(LIB_DIR)/libtinypar.a
 TEST := $(BUILD_DIR)/test_parallel_for
+MC_TEST := $(BUILD_DIR)/test_montecarlo
+
+EXAMPLE_SRC := $(wildcard examples/*.c)
+EXAMPLES := $(EXAMPLE_SRC:examples/%.c=$(BUILD_DIR)/%)
 
 UNAME_S := $(shell uname -s 2>/dev/null)
 ifeq ($(OS),Windows_NT)
@@ -45,8 +49,17 @@ $(LIBRARY): $(OBJECTS) | $(LIB_DIR)
 $(TEST): tests/test_parallel_for.c $(LIBRARY) | $(BUILD_DIR)
 	$(CC) $(CPPFLAGS) $(CFLAGS) $(THREAD_FLAGS) $< $(LIBRARY) -o $@
 
-test: $(TEST)
+$(MC_TEST): tests/test_montecarlo.c $(LIBRARY) | $(BUILD_DIR)
+	$(CC) $(CPPFLAGS) $(CFLAGS) $(THREAD_FLAGS) $< $(LIBRARY) -lm -o $@
+
+$(BUILD_DIR)/%: examples/%.c $(LIBRARY) | $(BUILD_DIR)
+	$(CC) $(CPPFLAGS) $(CFLAGS) $(THREAD_FLAGS) $< $(LIBRARY) -lm -o $@
+
+examples: $(EXAMPLES)
+
+test: $(TEST) $(MC_TEST)
 	$(TEST)
+	$(MC_TEST)
 
 install: $(LIBRARY)
 	mkdir -p $(DESTDIR)$(LIBDIR) $(DESTDIR)$(INCLUDEDIR) $(DESTDIR)$(PKGCONFIGDIR)
@@ -59,4 +72,4 @@ install: $(LIBRARY)
 clean:
 	rm -rf $(BUILD_DIR) $(LIB_DIR)
 
-.PHONY: all test install clean
+.PHONY: all test examples install clean

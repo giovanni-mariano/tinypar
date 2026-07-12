@@ -10,6 +10,11 @@ INCLUDES = /Iinclude /Isrc
 CFLAGS = /nologo /std:c11 /W4 /WX $(INCLUDES)
 LIBRARY = $(LIBDIR)\tinypar.lib
 TEST = $(BUILD)\test_parallel_for.exe
+MC_TEST = $(BUILD)\test_montecarlo.exe
+
+EXAMPLES = $(BUILD)\array_map.exe $(BUILD)\pi_integration.exe \
+	$(BUILD)\parallel_find.exe $(BUILD)\mandelbrot.exe \
+	$(BUILD)\neutron_slab.exe
 
 all: $(LIBRARY)
 
@@ -29,11 +34,24 @@ $(LIBRARY): $(BUILD)\tinypar.obj $(BUILD)\tinypar_win32.obj dirs
 $(TEST): tests\test_parallel_for.c $(LIBRARY) dirs
 	$(CC) $(CFLAGS) /Fe$@ tests\test_parallel_for.c $(LIBRARY)
 
-test: $(TEST)
+$(MC_TEST): tests\test_montecarlo.c $(LIBRARY) dirs
+	$(CC) $(CFLAGS) /Fe$@ tests\test_montecarlo.c $(LIBRARY)
+
+# Inference rule: build build\<name>.exe from examples\<name>.c. The MSVC CRT
+# provides the math functions, so no separate math library is needed.
+{examples\}.c{$(BUILD)\}.exe:
+	$(CC) $(CFLAGS) /Fe$@ $< $(LIBRARY)
+
+$(EXAMPLES): $(LIBRARY) dirs
+
+examples: $(EXAMPLES)
+
+test: $(TEST) $(MC_TEST)
 	$(TEST)
+	$(MC_TEST)
 
 clean:
 	@if exist $(BUILD) rmdir /S /Q $(BUILD)
 	@if exist $(LIBDIR) rmdir /S /Q $(LIBDIR)
 
-.PHONY: all dirs test clean
+.PHONY: all dirs test examples clean

@@ -19,17 +19,34 @@ make
 make test
 ```
 
+Runnable examples live in `examples/`, each demonstrating one usage pattern:
+
+| File | Shows |
+| --- | --- |
+| `array_map.c` | Minimal parallel-for over an array (independent writes). |
+| `pi_integration.c` | Reduction via per-worker partial sums. |
+| `parallel_find.c` | Cooperative cancellation using a non-zero callback result. |
+| `mandelbrot.c` | Dynamic scheduling balancing an uneven per-item workload. |
+| `neutron_slab.c` | A reproducible Monte Carlo simulation, one history per index. |
+
+Build them all (binaries land in `build/`):
+
+```sh
+make examples
+```
+
 With an MSVC developer prompt:
 
 ```text
 nmake /f Makefile.msvc
 nmake /f Makefile.msvc test
+nmake /f Makefile.msvc examples
 ```
 
 POSIX consumers must compile and link with `-pthread`:
 
 ```sh
-cc -std=c11 -Iinclude example.c lib/libtinypar.a -pthread
+cc -std=c11 -Iinclude examples/array_map.c lib/libtinypar.a -pthread
 ```
 
 ## API model
@@ -62,4 +79,4 @@ tinypar_status_t status = tinypar_parallel_for(&config, process, context);
 ## License
 
 tinypar is licensed under the Mozilla Public License, version 2.0. See
-`LICENSE`.
+`LICENSES/MPL-2.0.txt`.
