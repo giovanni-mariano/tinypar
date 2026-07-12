@@ -16,7 +16,7 @@ jobs:
     name: Linux archive
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       - name: Build and test
         run: make clean && make test CC=gcc
       - name: Stage archive
@@ -34,7 +34,7 @@ jobs:
     name: macOS archive
     runs-on: macos-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       - name: Build and test
         run: make clean && make test CC=clang
       - name: Stage archive
@@ -52,7 +52,7 @@ jobs:
     name: Windows archive
     runs-on: windows-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       - uses: ilammy/msvc-dev-cmd@v1
       - name: Build and test
         shell: cmd
