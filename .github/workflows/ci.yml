@@ -31,7 +31,7 @@ jobs:
             os: macos-latest
             cc: clang
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       - name: Build and test
         run: make clean && make test CC="${{ matrix.cc }}"
 
@@ -39,7 +39,7 @@ jobs:
     name: Windows MSVC
     runs-on: windows-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       - uses: ilammy/msvc-dev-cmd@v1
       - name: Build and test
         shell: cmd
