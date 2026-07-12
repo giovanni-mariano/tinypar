@@ -1,0 +1,37 @@
+# SPDX-License-Identifier: MPL-2.0
+
+CC = cl
+AR = lib
+BUILD = build
+LIBDIR = lib
+INCLUDES = /Iinclude /Isrc
+CFLAGS = /nologo /std:c11 /W4 /WX $(INCLUDES)
+LIBRARY = $(LIBDIR)\tinypar.lib
+TEST = $(BUILD)\test_parallel_for.exe
+
+all: $(LIBRARY)
+
+dirs:
+	@if not exist $(BUILD) mkdir $(BUILD)
+	@if not exist $(LIBDIR) mkdir $(LIBDIR)
+
+$(BUILD)\tinypar.obj: src\tinypar.c dirs
+	$(CC) $(CFLAGS) /c /Fo$@ src\tinypar.c
+
+$(BUILD)\tinypar_win32.obj: src\tinypar_win32.c dirs
+	$(CC) $(CFLAGS) /c /Fo$@ src\tinypar_win32.c
+
+$(LIBRARY): $(BUILD)\tinypar.obj $(BUILD)\tinypar_win32.obj dirs
+	$(AR) /nologo /OUT:$@ $(BUILD)\tinypar.obj $(BUILD)\tinypar_win32.obj
+
+$(TEST): tests\test_parallel_for.c $(LIBRARY) dirs
+	$(CC) $(CFLAGS) /Fe$@ tests\test_parallel_for.c $(LIBRARY)
+
+test: $(TEST)
+	$(TEST)
+
+clean:
+	@if exist $(BUILD) rmdir /S /Q $(BUILD)
+	@if exist $(LIBDIR) rmdir /S /Q $(LIBDIR)
+
+.PHONY: all dirs test clean

@@ -1,0 +1,91 @@
+name: Release
+
+on:
+  push:
+    tags: ["v*"]
+
+permissions:
+  contents: read
+
+jobs:
+  linux:
+    name: Linux archive
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build and test
+        run: make clean && make test CC=gcc
+      - name: Stage archive
+        run: |
+          make install DESTDIR="$PWD/stage"
+          mkdir dist
+          tar -czf "$PWD/dist/tinypar-linux-x86_64.tar.gz" -C stage/usr/local include lib
+      - uses: actions/upload-artifact@v4
+        with:
+          name: tinypar-linux-x86_64
+          path: dist/tinypar-linux-x86_64.tar.gz
+          if-no-files-found: error
+
+  macos:
+    name: macOS archive
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build and test
+        run: make clean && make test CC=clang
+      - name: Stage archive
+        run: |
+          make install DESTDIR="$PWD/stage"
+          mkdir dist
+          tar -czf "$PWD/dist/tinypar-macos-arm64.tar.gz" -C stage/usr/local include lib
+      - uses: actions/upload-artifact@v4
+        with:
+          name: tinypar-macos-arm64
+          path: dist/tinypar-macos-arm64.tar.gz
+          if-no-files-found: error
+
+  windows:
+    name: Windows archive
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ilammy/msvc-dev-cmd@v1
+      - name: Build and test
+        shell: cmd
+        run: nmake /f Makefile.msvc test
+      - name: Stage archive
+        shell: pwsh
+        run: |
+          New-Item -ItemType Directory -Force -Path dist/tinypar-windows-x64/include | Out-Null
+          New-Item -ItemType Directory -Force -Path dist/tinypar-windows-x64/lib | Out-Null
+          Copy-Item include/tinypar.h dist/tinypar-windows-x64/include/
+          Copy-Item lib/tinypar.lib dist/tinypar-windows-x64/lib/
+          Copy-Item README.md,LICENSE dist/tinypar-windows-x64/
+          Compress-Archive -Path dist/tinypar-windows-x64 -DestinationPath dist/tinypar-windows-x64.zip
+      - uses: actions/upload-artifact@v4
+        with:
+          name: tinypar-windows-x64
+          path: dist/tinypar-windows-x64.zip
+          if-no-files-found: error
+
+  publish:
+    name: Publish GitHub release
+    needs: [linux, macos, windows]
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/download-artifact@v5
+        with:
+          path: release-assets
+          merge-multiple: true
+      - name: Create or update release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TAG: ${{ github.ref_name }}
+        run: |
+          if gh release view "$TAG" >/dev/null 2>&1; then
+            gh release upload "$TAG" release-assets/* --clobber
+          else
+            gh release create "$TAG" release-assets/* --title "Tinypar $TAG" --generate-notes
+          fi

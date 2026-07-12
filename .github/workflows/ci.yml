@@ -1,0 +1,42 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  posix:
+    name: ${{ matrix.name }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - name: Linux GCC
+            os: ubuntu-latest
+            cc: gcc
+          - name: Linux Clang
+            os: ubuntu-latest
+            cc: clang
+          - name: macOS Clang
+            os: macos-latest
+            cc: clang
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build and test
+        run: make clean && make test CC="${{ matrix.cc }}"
+
+  windows-msvc:
+    name: Windows MSVC
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ilammy/msvc-dev-cmd@v1
+      - name: Build and test
+        shell: cmd
+        run: nmake /f Makefile.msvc test

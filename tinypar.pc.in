@@ -1,0 +1,10 @@
+prefix=@PREFIX@
+libdir=@LIBDIR@
+includedir=@INCLUDEDIR@
+
+Name: tinypar
+Description: Small native-threaded dynamic parallel-for library
+Version: 0.1.0
+Libs: -L${libdir} -ltinypar
+Libs.private: -pthread
+Cflags: -I${includedir}
